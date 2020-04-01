@@ -1,7 +1,6 @@
 /* eslint-disable react/state-in-constructor */
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { MdAddShoppingCart } from 'react-icons/md';
 import { formatPrice } from '../../util/format';
 import api from '../../services/api';
@@ -9,8 +8,17 @@ import api from '../../services/api';
 import * as CartActions from '../../store/modules/cart/actions';
 import { ProductList } from './styles';
 
-function Home({ addToCartRequest, amount }) {
+export default function Home() {
 	const [products, setProducts] = useState([]);
+	const amount = useSelector(state =>
+		state.cart.reduce((amountSum, product) => {
+			amountSum[product.id] = product.amount;
+
+			return amountSum;
+		}, {})
+	);
+
+	const dispatch = useDispatch();
 
 	useEffect(() => {
 		async function loadProducts() {
@@ -29,7 +37,7 @@ function Home({ addToCartRequest, amount }) {
 	});
 
 	function handleAddProduct(id) {
-		addToCartRequest(id);
+		dispatch(CartActions.addToCartRequest(id));
 	}
 
 	return (
@@ -56,16 +64,3 @@ function Home({ addToCartRequest, amount }) {
 		</ProductList>
 	);
 }
-
-const mapStateToProps = state => ({
-	amount: state.cart.reduce((amount, product) => {
-		amount[product.id] = product.amount;
-
-		return amount;
-	}, {}),
-});
-
-const mapDispatchToProps = dispatch =>
-	bindActionCreators(CartActions, dispatch);
-
-export default connect(mapStateToProps, mapDispatchToProps)(Home);
