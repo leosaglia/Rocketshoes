@@ -4,18 +4,9 @@ export default function Cart(state = [], action) {
 	switch (action.type) {
 		case '@cart/ADD_SUCESS':
 			return produce(state, draftState => {
-				const productIndex = draftState.findIndex(
-					p => p.id === action.product.id
-				);
+				const { product } = action;
 
-				if (productIndex >= 0) {
-					draftState[productIndex].amount += 1;
-				} else {
-					draftState.push({
-						...action.product,
-						amount: 1,
-					});
-				}
+				draftState.push(product);
 			});
 		case '@cart/REMOVE':
 			return produce(state, draftState => {
@@ -27,11 +18,7 @@ export default function Cart(state = [], action) {
 					draftState.splice(productIndex.id, 1);
 				}
 			});
-		case '@cart/UPDATE_AMOUNT': {
-			if (action.amount <= 0) {
-				return state;
-			}
-
+		case '@cart/UPDATE_AMOUNT_SUCESS': {
 			return produce(state, draftState => {
 				const productIndex = draftState.findIndex(
 					p => p.id === action.id
